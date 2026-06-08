@@ -227,8 +227,8 @@ const OwnerDashboard: React.FC = () => {
         name: cafeForm.name,
         description: cafeForm.description,
         location: cafeForm.location,
-        lat: cafeForm.lat ? parseFloat(cafeForm.lat) : null,
-        lng: cafeForm.lng ? parseFloat(cafeForm.lng) : null,
+        lat: cafeForm.lat ? parseFloat(String(cafeForm.lat).replace(',', '.')) : null,
+        lng: cafeForm.lng ? parseFloat(String(cafeForm.lng).replace(',', '.')) : null,
         openingHours: cafeForm.openingHours,
         facilities: facilitiesArray,
         priceRange: cafeForm.priceRange,
@@ -290,8 +290,8 @@ const OwnerDashboard: React.FC = () => {
           website: cafeForm.website || '', 
           tiktok: cafeForm.tiktok || '' 
         },
-        lat: cafeForm.lat ? parseFloat(cafeForm.lat) : null,
-        lng: cafeForm.lng ? parseFloat(cafeForm.lng) : null
+        lat: cafeForm.lat ? parseFloat(String(cafeForm.lat).replace(',', '.')) : null,
+        lng: cafeForm.lng ? parseFloat(String(cafeForm.lng).replace(',', '.')) : null
       });
 
       setSuccessMsg('Profil kafe berhasil diperbarui secara langsung!');

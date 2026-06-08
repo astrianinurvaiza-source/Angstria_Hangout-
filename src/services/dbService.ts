@@ -112,8 +112,21 @@ const normalizePlace = (p: any): Place => {
     featured: p.featured === true || p.featured === 1 || p.featured === '1' || p.featured === 'true',
     views: typeof p.views === 'number' ? p.views : parseInt(p.views || '0', 10),
     rating: typeof p.rating === 'number' ? p.rating : parseFloat(p.rating || '0'),
-    lat: p.lat !== null && p.lat !== undefined ? parseFloat(p.lat) : null,
-    lng: p.lng !== null && p.lng !== undefined ? parseFloat(p.lng) : null,
+    lat: (() => {
+      const v = (p.lat !== null && p.lat !== undefined && p.lat !== '') ? p.lat : 
+                (p.latitude !== null && p.latitude !== undefined && p.latitude !== '') ? p.latitude : null;
+      if (v === null || v === undefined || v === '') return null;
+      const parsed = parseFloat(String(v).replace(',', '.'));
+      return isNaN(parsed) ? null : parsed;
+    })(),
+    lng: (() => {
+      const v = (p.lng !== null && p.lng !== undefined && p.lng !== '') ? p.lng : 
+                (p.longitude !== null && p.longitude !== undefined && p.longitude !== '') ? p.longitude : 
+                (p.longtitude !== null && p.longtitude !== undefined && p.longtitude !== '') ? p.longtitude : null;
+      if (v === null || v === undefined || v === '') return null;
+      const parsed = parseFloat(String(v).replace(',', '.'));
+      return isNaN(parsed) ? null : parsed;
+    })(),
     socials: socials || undefined
   };
 };

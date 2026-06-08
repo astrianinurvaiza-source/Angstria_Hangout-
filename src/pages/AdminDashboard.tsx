@@ -206,8 +206,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
       // 1. Amankan koordinat lat & lng, lakukan parse float hanya sebelum disimpan agar pengetikan manual (termasuk tanda minus dan desimal) lancar
       const preparedPlace = {
         ...editingPlace,
-        lat: editingPlace.lat !== undefined && editingPlace.lat !== '' && editingPlace.lat !== null ? parseFloat(editingPlace.lat as any) : null,
-        lng: editingPlace.lng !== undefined && editingPlace.lng !== '' && editingPlace.lng !== null ? parseFloat(editingPlace.lng as any) : null
+        lat: editingPlace.lat !== undefined && editingPlace.lat !== '' && editingPlace.lat !== null ? parseFloat(String(editingPlace.lat).replace(',', '.')) : null,
+        lng: editingPlace.lng !== undefined && editingPlace.lng !== '' && editingPlace.lng !== null ? parseFloat(String(editingPlace.lng).replace(',', '.')) : null
       };
 
       if (preparedPlace.lat !== null && isNaN(preparedPlace.lat)) preparedPlace.lat = null;

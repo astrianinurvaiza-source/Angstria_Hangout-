@@ -872,7 +872,7 @@ app.all("/api.php", async (req, res) => {
         throw new Error("invalid_json_response");
       }
     } catch (error: any) {
-      console.warn(`[DATABASE PROXY WARN] Fallback to node backend database emulator due to error: ${error.message}`);
+      console.log(`[DATABASE PROXY INFO] Menggunakan database emulator lokal karena server PHPMyAdmin belum terhubung: ${error.message}`);
       return handleLocalDBEmulator(req, res);
     }
   } else {

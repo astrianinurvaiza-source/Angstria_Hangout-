@@ -403,26 +403,48 @@ switch ($action) {
         }
 
         try {
-            $stmt = $conn->prepare("
-                INSERT INTO places (id, name, description, location, lat, lng, openingHours, facilities, priceRange, featured, tags, image, images, socials, createdAt)
-                VALUES (:id, :name, :description, :location, :lat, :lng, :openingHours, :facilities, :priceRange, :featured, :tags, :image, :images, :socials, NOW())
-            ");
-            $stmt->execute([
+            // Deteksi kolom yang ada di tabel places untuk adaptasi otomatis
+            $places_cols = [];
+            $q_cols = $conn->query("SHOW COLUMNS FROM `places`");
+            while ($c_row = $q_cols->fetch(PDO::FETCH_ASSOC)) {
+                $places_cols[] = $c_row['Field'];
+            }
+
+            $lat_field = in_array('latitude', $places_cols) ? 'latitude' : (in_array('lat', $places_cols) ? 'lat' : null);
+            $lng_field = in_array('longitude', $places_cols) ? 'longitude' : (in_array('longtitude', $places_cols) ? 'longtitude' : (in_array('lng', $places_cols) ? 'lng' : null));
+
+            $fields = ["id", "name", "description", "location", "openingHours", "facilities", "priceRange", "featured", "tags", "image", "images", "socials", "createdAt"];
+            $values = [":id", ":name", ":description", ":location", ":openingHours", ":facilities", ":priceRange", ":featured", ":tags", ":image", ":images", ":socials", "NOW()"];
+            
+            $bindings = [
                 'id' => $id,
                 'name' => $name,
                 'description' => $description,
                 'location' => $location,
-                'lat' => $data['lat'] ?? null,
-                'lng' => $data['lng'] ?? null,
                 'openingHours' => $data['openingHours'] ?? null,
-                'facilities' => $data['facilities'] ? (is_array($data['facilities']) ? implode(',', $data['facilities']) : $data['facilities']) : null,
+                'facilities' => isset($data['facilities']) ? (is_array($data['facilities']) ? implode(',', $data['facilities']) : $data['facilities']) : null,
                 'priceRange' => $data['priceRange'] ?? null,
                 'featured' => !empty($data['featured']) ? 1 : 0,
-                'tags' => $data['tags'] ? (is_array($data['tags']) ? implode(',', $data['tags']) : $data['tags']) : null,
+                'tags' => isset($data['tags']) ? (is_array($data['tags']) ? implode(',', $data['tags']) : $data['tags']) : null,
                 'image' => $data['image'] ?? null,
-                'images' => $data['images'] ? (is_array($data['images']) ? json_encode($data['images']) : $data['images']) : null,
+                'images' => isset($data['images']) ? (is_array($data['images']) ? json_encode($data['images']) : $data['images']) : null,
                 'socials' => isset($data['socials']) ? (is_array($data['socials']) ? json_encode($data['socials']) : $data['socials']) : null
-            ]);
+            ];
+
+            if ($lat_field !== null) {
+                $fields[] = $lat_field;
+                $values[] = ":lat";
+                $bindings['lat'] = $data['lat'] ?? $data['latitude'] ?? null;
+            }
+            if ($lng_field !== null) {
+                $fields[] = $lng_field;
+                $values[] = ":lng";
+                $bindings['lng'] = $data['lng'] ?? $data['longitude'] ?? $data['longtitude'] ?? null;
+            }
+
+            $sql = "INSERT INTO places (" . implode(", ", $fields) . ") VALUES (" . implode(", ", $values) . ")";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($bindings);
 
             // Jika dibuat oleh pemilik kafe (Owner), tautkan cafeId ke akun pemilik di tabel owners
             if (!empty($data['ownerEmail'])) {
@@ -462,39 +484,57 @@ switch ($action) {
         }
 
         try {
-            $stmt = $conn->prepare("
-                UPDATE places SET 
-                    name = :name,
-                    description = :description,
-                    location = :location,
-                    lat = :lat,
-                    lng = :lng,
-                    openingHours = :openingHours,
-                    facilities = :facilities,
-                    priceRange = :priceRange,
-                    featured = :featured,
-                    tags = :tags,
-                    image = :image,
-                    images = :images,
-                    socials = :socials
-                WHERE id = :id
-            ");
-            $stmt->execute([
+            // Deteksi kolom yang ada di tabel places untuk adaptasi otomatis
+            $places_cols = [];
+            $q_cols = $conn->query("SHOW COLUMNS FROM `places`");
+            while ($c_row = $q_cols->fetch(PDO::FETCH_ASSOC)) {
+                $places_cols[] = $c_row['Field'];
+            }
+
+            $lat_field = in_array('latitude', $places_cols) ? 'latitude' : (in_array('lat', $places_cols) ? 'lat' : null);
+            $lng_field = in_array('longitude', $places_cols) ? 'longitude' : (in_array('longtitude', $places_cols) ? 'longtitude' : (in_array('lng', $places_cols) ? 'lng' : null));
+
+            $sql_sets = [
+                "name = :name",
+                "description = :description",
+                "location = :location",
+                "openingHours = :openingHours",
+                "facilities = :facilities",
+                "priceRange = :priceRange",
+                "featured = :featured",
+                "tags = :tags",
+                "image = :image",
+                "images = :images",
+                "socials = :socials"
+            ];
+
+            $bindings = [
                 'id' => $id,
                 'name' => $name,
                 'description' => $description,
                 'location' => $location,
-                'lat' => $data['lat'] ?? null,
-                'lng' => $data['lng'] ?? null,
                 'openingHours' => $data['openingHours'] ?? null,
-                'facilities' => $data['facilities'] ? (is_array($data['facilities']) ? implode(',', $data['facilities']) : $data['facilities']) : null,
+                'facilities' => isset($data['facilities']) ? (is_array($data['facilities']) ? implode(',', $data['facilities']) : $data['facilities']) : null,
                 'priceRange' => $data['priceRange'] ?? null,
                 'featured' => !empty($data['featured']) ? 1 : 0,
-                'tags' => $data['tags'] ? (is_array($data['tags']) ? implode(',', $data['tags']) : $data['tags']) : null,
+                'tags' => isset($data['tags']) ? (is_array($data['tags']) ? implode(',', $data['tags']) : $data['tags']) : null,
                 'image' => $data['image'] ?? null,
-                'images' => $data['images'] ? (is_array($data['images']) ? json_encode($data['images']) : $data['images']) : null,
+                'images' => isset($data['images']) ? (is_array($data['images']) ? json_encode($data['images']) : $data['images']) : null,
                 'socials' => isset($data['socials']) ? (is_array($data['socials']) ? json_encode($data['socials']) : $data['socials']) : null
-            ]);
+            ];
+
+            if ($lat_field !== null) {
+                $sql_sets[] = "$lat_field = :lat";
+                $bindings['lat'] = $data['lat'] ?? $data['latitude'] ?? null;
+            }
+            if ($lng_field !== null) {
+                $sql_sets[] = "$lng_field = :lng";
+                $bindings['lng'] = $data['lng'] ?? $data['longitude'] ?? $data['longtitude'] ?? null;
+            }
+
+            $sql = "UPDATE places SET " . implode(", ", $sql_sets) . " WHERE id = :id";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($bindings);
 
             echo json_encode(["success" => true, "message" => "Tempat berhasil diperbarui"]);
         } catch (PDOException $e) {
