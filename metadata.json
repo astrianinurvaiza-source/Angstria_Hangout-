@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Remix: Angstria Hangout",
+  "description": "A modern, aesthetic hangout recommendation platform for finding the best cafe spots, featuring real-time search, ratings, and a beautiful cafe-inspired design.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+
+  --color-cafe-beige: #F5F2ED;
+  --color-cafe-cream: #FFFDF9;
+  --color-cafe-brown: #5A4633;
+  --color-cafe-mocha: #8D775F;
+  --color-cafe-pastel: #EAE0D5;
+  --color-soft-green: #D4E0D7;
+  --color-sage: #9AB0A1;
+}
+
+@variant dark (&:where(.dark, .dark *));
+
+.dark {
+  --color-cafe-beige: #0C0B0A;
+  --color-cafe-cream: #141312;
+  --color-cafe-brown: #FAFAF9;
+  --color-cafe-mocha: #A89584;
+  --color-cafe-pastel: #24211D;
+  --color-soft-green: #212823;
+  --color-sage: #BDD1C4;
+}
+
+/* Stunning Dark Mode Global Overrides to Prevent White-on-White Text and Ensure Maximum Contrast & Readability */
+.dark .bg-white {
+  background-color: var(--color-cafe-cream) !important;
+}
+
+.dark .hover\:bg-white:hover {
+  background-color: var(--color-cafe-pastel) !important;
+}
+
+.dark .border-cafe-pastel, .dark .border-cafe-pastel\/50, .dark .border-cafe-pastel\/60, .dark .border-cafe-pastel\/65, .dark .border-cafe-pastel\/80 {
+  border-color: var(--color-cafe-pastel) !important;
+}
+
+.dark .bg-cafe-beige {
+  background-color: var(--color-cafe-beige) !important;
+}
+
+/* Beautiful custom input visual styling for dark mode */
+.dark input, .dark textarea, .dark select {
+  background-color: rgba(36, 33, 29, 0.4) !important;
+  color: var(--color-cafe-brown) !important;
+  border-color: var(--color-cafe-pastel) !important;
+  outline: none !important;
+}
+
+.dark input:focus, .dark textarea:focus, .dark select:focus {
+  border-color: var(--color-cafe-mocha) !important;
+}
+
+.dark ::placeholder, .dark input::placeholder, .dark textarea::placeholder {
+  color: var(--color-cafe-mocha) !important;
+  opacity: 0.75 !important;
+}
+
+/* Soft and safe semantic layout adjustments (Success, Warning, Info, Danger blocks in dark mode) */
+.dark .bg-orange-50, 
+.dark .bg-orange-50\/60, 
+.dark .bg-amber-50,
+.dark .bg-amber-50\/40,
+.dark .bg-cafe-beige\/40 {
+  background-color: rgba(249, 115, 22, 0.1) !important;
+  color: #FB923C !important;
+  border-color: rgba(249, 115, 22, 0.25) !important;
+}
+
+.dark .bg-red-50, 
+.dark .bg-rose-50\/50, 
+.dark .bg-rose-50 {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  color: #F87171 !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+.dark .bg-emerald-50, 
+.dark .bg-green-50,
+.dark .bg-emerald-50\/60 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  color: #34D399 !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+.dark .bg-blue-100, 
+.dark .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+  color: #60A5FA !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Ensure raw grey text ranges don't become invisible in dark cards */
+.dark .text-gray-800, 
+.dark .text-gray-700, 
+.dark .text-gray-900 {
+  color: var(--color-cafe-brown) !important;
+}
+
+.dark .text-gray-500, 
+.dark .text-gray-650 {
+  color: var(--color-cafe-mocha) !important;
+}
+
+.dark .bg-gray-50, 
+.dark .bg-gray-100 {
+  background-color: var(--color-cafe-pastel) !important;
+}
+
+.dark .border-gray-100, 
+.dark .border-gray-200,
+.dark .border-gray-200\/50 {
+  border-color: var(--color-cafe-pastel) !important;
+}
+
+@layer base {
+  body {
+    @apply bg-cafe-beige text-cafe-brown font-sans antialiased transition-colors duration-300;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight text-cafe-brown;
+  }
+}
+
+.cafe-card {
+  @apply bg-cafe-cream border border-cafe-pastel rounded-[2rem] overflow-hidden shadow-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2;
+}
+
+.dark .cafe-card {
+  @apply shadow-none ring-1 ring-white/5 bg-cafe-cream/50;
+}
+
+.btn-primary {
+  @apply px-8 py-3 bg-cafe-brown text-cafe-cream rounded-full font-semibold transition-all hover:bg-cafe-mocha hover:shadow-lg hover:shadow-cafe-brown/20 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply px-8 py-3 bg-soft-green/30 text-sage rounded-full font-semibold transition-all hover:bg-soft-green/50 hover:text-cafe-brown active:scale-95 border border-soft-green/50 cursor-pointer;
+}
+
+.glass-nav {
+  @apply sticky top-0 z-50 bg-cafe-beige/70 backdrop-blur-xl border-b border-cafe-pastel/50 transition-colors duration-300;
+}
+
+.input-modern {
+  @apply w-full px-6 py-4 bg-cafe-cream/90 backdrop-blur-sm border border-cafe-pastel rounded-2xl focus:ring-2 focus:ring-cafe-brown/20 focus:border-cafe-brown outline-none transition-all shadow-sm text-cafe-brown placeholder:text-cafe-mocha/40;
+}
