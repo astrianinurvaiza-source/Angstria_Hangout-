@@ -49,6 +49,10 @@ const UserDashboard: React.FC = () => {
   const [bookingSuccess, setBookingSuccess] = useState('');
   const [bookingError, setBookingError] = useState('');
 
+  // Cancel Reservation States
+  const [cancellingId, setCancellingId] = useState<number | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
+
   // Load User Session
   useEffect(() => {
     const checkUserSession = () => {
@@ -195,6 +199,23 @@ const UserDashboard: React.FC = () => {
     setSuccessMsg('Anda telah berhasil keluar akun.');
     window.dispatchEvent(new Event('user-auth-changed'));
     setTimeout(() => setSuccessMsg(''), 4000);
+  };
+
+  const handleCancelReservation = async (reservationId: number) => {
+    setIsCancelling(true);
+    try {
+      await reservationsService.updateReservationStatus(reservationId, 'cancelled');
+      setSuccessMsg('Reservasi Anda berhasil dibatalkan.');
+      setCancellingId(null);
+      // Refresh list of reservations
+      await fetchUserDashboardData();
+      setTimeout(() => setSuccessMsg(''), 4000);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Gagal membatalkan reservasi.');
+      setTimeout(() => setErrorMsg(''), 4000);
+    } finally {
+      setIsCancelling(false);
+    }
   };
 
   // Filter favorite places
@@ -487,6 +508,10 @@ const UserDashboard: React.FC = () => {
                                   <span className="px-3.5 py-1 bg-rose-100 text-rose-800 text-[10px] font-bold rounded-full border border-rose-200">
                                     Ditolak
                                   </span>
+                                ) : res.status === 'cancelled' || res.status === 'canceled' ? (
+                                  <span className="px-3.5 py-1 bg-gray-100 text-gray-500 text-[10px] font-bold rounded-full border border-gray-200">
+                                    Dibatalkan
+                                  </span>
                                 ) : (
                                   <span className="px-3.5 py-1 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full border border-amber-200 animate-pulse">
                                     Menunggu
@@ -494,14 +519,14 @@ const UserDashboard: React.FC = () => {
                                 )}
                               </div>
                             </div>
-
+ 
                             <Link to={`/places/${res.placeId}`} className="group hover:underline text-cafe-brown">
                               <h3 className="font-serif font-black text-xl mb-3 flex items-center gap-2">
                                 {res.placeName || 'Kafe'}
                                 <ChevronRight size={16} className="text-cafe-mocha opacity-35 group-hover:opacity-100 transition-opacity" />
                               </h3>
                             </Link>
-
+ 
                             <div className="space-y-2.5 my-4 border-t border-b border-cafe-pastel/60 py-4">
                               <div className="flex items-center gap-2 text-xs text-cafe-mocha">
                                 <Calendar size={14} className="text-cafe-brown" />
@@ -523,14 +548,47 @@ const UserDashboard: React.FC = () => {
                               </div>
                             )}
                           </div>
+ 
+                          <div className="pt-6 mt-4 border-t border-cafe-pastel/40 flex flex-col gap-3">
+                            {res.status !== 'rejected' && res.status !== 'cancelled' && res.status !== 'canceled' ? (
+                              cancellingId === res.id ? (
+                                <div className="bg-red-50 border border-red-200 rounded-2xl p-4 space-y-3">
+                                  <p className="text-xs font-medium text-red-700">Yakin ingin membatalkan reservasi ini?</p>
+                                  <div className="flex gap-2">
+                                    <button
+                                      disabled={isCancelling}
+                                      onClick={() => handleCancelReservation(res.id)}
+                                      className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+                                    >
+                                      {isCancelling ? 'Memproses...' : 'Ya, Batalkan'}
+                                    </button>
+                                    <button
+                                      disabled={isCancelling}
+                                      onClick={() => setCancellingId(null)}
+                                      className="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+                                    >
+                                      Tutup
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => setCancellingId(res.id)}
+                                  className="w-full text-center py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold transition-all border border-red-100 cursor-pointer"
+                                >
+                                  ❌ Batalkan Reservasi
+                                </button>
+                              )
+                            ) : null}
 
-                          <div className="pt-6 mt-4 border-t border-cafe-pastel/40 flex justify-end">
-                            <Link 
-                              to={`/places/${res.placeId}`} 
-                              className="text-xs font-bold text-cafe-brown hover:underline inline-flex items-center gap-1"
-                            >
-                              Detail Kafe & Kontak <ChevronRight size={14} />
-                            </Link>
+                            <div className="flex justify-end pt-1">
+                              <Link 
+                                to={`/places/${res.placeId}`} 
+                                className="text-xs font-bold text-cafe-brown hover:underline inline-flex items-center gap-1"
+                              >
+                                Detail Kafe & Kontak <ChevronRight size={14} />
+                              </Link>
+                            </div>
                           </div>
                         </div>
                       ))}
