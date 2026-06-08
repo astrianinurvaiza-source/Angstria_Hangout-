@@ -6,7 +6,7 @@ import {
   ChevronLeft, Coffee, Wifi, Wind, 
   Music, User, Send, Smartphone, MessageCircle,
   Camera, Sparkles, Heart, Instagram, Globe, Video,
-  Copy, Check, Calendar,
+  Copy, Check, Calendar, X,
 } from 'lucide-react';
 import { placesService, commentsService, reservationsService } from '../services/dbService';
 import { Place, Comment } from '../types';
@@ -245,15 +245,22 @@ const PlaceDetails: React.FC = () => {
             className={`p-3 backdrop-blur-md rounded-full transition-all border border-white/20 ${
               favorite ? 'bg-red-500 text-white border-red-400' : 'bg-white/20 text-white hover:bg-white/40'
             }`}
+            title="Suka / Favorit"
           >
             <Heart size={24} fill={favorite ? 'currentColor' : 'none'} />
           </button>
-          <button onClick={handleShare} className="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all border border-white/20">
+          <button onClick={handleShare} className="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all border border-white/20" title="Bagikan">
             <Share2 size={24} />
           </button>
-          <button onClick={handleWhatsAppShare} className="p-3 bg-green-500/80 backdrop-blur-md rounded-full text-white hover:bg-green-600 transition-all border border-white/20">
+          <a 
+            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Temukan tempat nongkrong estetik ini: *${place?.name}* di Pangkal Pinang! ☕✨\n${window.location.href}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3 bg-green-500/80 backdrop-blur-md rounded-full text-white hover:bg-green-600 transition-all border border-white/20 flex items-center justify-center"
+            title="Bagikan ke WhatsApp"
+          >
             <MessageCircle size={24} />
-          </button>
+          </a>
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
@@ -379,7 +386,9 @@ const PlaceDetails: React.FC = () => {
                 <iframe
                   title={`Peta Lokasi ${place.name}`}
                   src={
-                    place.lat && place.lng 
+                    place.lat !== null && place.lat !== undefined && !isNaN(place.lat) && 
+                    place.lng !== null && place.lng !== undefined && !isNaN(place.lng) && 
+                    (place.lat !== 0 || place.lng !== 0)
                       ? `https://maps.google.com/maps?q=${place.lat},${place.lng}&t=&z=16&ie=UTF8&iwloc=&output=embed`
                       : `https://maps.google.com/maps?q=${encodeURIComponent(place.name + ', ' + place.location)}&t=&z=16&ie=UTF8&iwloc=&output=embed`
                   }
@@ -397,7 +406,9 @@ const PlaceDetails: React.FC = () => {
                 </div>
                 <a
                   href={
-                    place.lat && place.lng
+                    place.lat !== null && place.lat !== undefined && !isNaN(place.lat) && 
+                    place.lng !== null && place.lng !== undefined && !isNaN(place.lng) && 
+                    (place.lat !== 0 || place.lng !== 0)
                       ? `https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}`
                       : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.location)}`
                   }
@@ -661,47 +672,55 @@ const PlaceDetails: React.FC = () => {
               </div>
 
               <div className="space-y-3 mb-6">
-                <button
-                  onClick={handleWhatsAppShare}
-                  className="w-full flex items-center gap-3 p-4 bg-green-50 hover:bg-green-100/80 text-green-700 font-bold text-sm rounded-2xl transition-all border border-green-100"
+                <a
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Temukan tempat nongkrong estetik ini: *${place?.name}* di Pangkal Pinang! ☕✨\n${window.location.href}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center gap-3 p-4 bg-green-50 hover:bg-green-100/80 text-green-700 font-bold text-sm rounded-2xl transition-all border border-green-100 text-left cursor-pointer"
                 >
-                  <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center flex-shrink-0">
                     <MessageCircle size={18} />
                   </div>
-                  Bagikan ke WhatsApp
-                </button>
+                  <span>Bagikan ke WhatsApp</span>
+                </a>
 
-                <button
-                  onClick={handleTelegramShare}
-                  className="w-full flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100/80 text-blue-700 font-bold text-sm rounded-2xl transition-all border border-blue-100"
+                <a
+                  href={`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(`Temukan tempat nongkrong estetik ini: *${place?.name}* di Pangkal Pinang! ☕✨`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100/80 text-blue-700 font-bold text-sm rounded-2xl transition-all border border-blue-100 text-left cursor-pointer"
                 >
-                  <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0">
                     <Send size={16} className="translate-x-[-1px] translate-y-[1px]" />
                   </div>
-                  Bagikan ke Telegram
-                </button>
+                  <span>Bagikan ke Telegram</span>
+                </a>
 
-                <button
-                  onClick={handleTwitterShare}
-                  className="w-full flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 text-gray-800 font-bold text-sm rounded-2xl transition-all border border-gray-100"
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(`Rekomendasi cafe estetik di Pangkal Pinang: ${place?.name}! ☕✨`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 text-gray-800 font-bold text-sm rounded-2xl transition-all border border-gray-100 text-left cursor-pointer"
                 >
-                  <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center flex-shrink-0">
                     <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                     </svg>
                   </div>
-                  Bagikan ke Twitter / X
-                </button>
+                  <span>Bagikan ke Twitter / X</span>
+                </a>
 
-                <button
-                  onClick={handleFacebookShare}
-                  className="w-full flex items-center gap-3 p-4 bg-indigo-50 hover:bg-indigo-100/80 text-indigo-700 font-bold text-sm rounded-2xl transition-all border border-indigo-100"
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center gap-3 p-4 bg-indigo-50 hover:bg-indigo-100/80 text-indigo-700 font-bold text-sm rounded-2xl transition-all border border-indigo-100 text-left cursor-pointer"
                 >
-                  <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-base">
+                  <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-base flex-shrink-0">
                     f
                   </div>
-                  Bagikan ke Facebook
-                </button>
+                  <span>Bagikan ke Facebook</span>
+                </a>
               </div>
 
               <div className="pt-4 border-t border-cafe-pastel flex items-center gap-2">

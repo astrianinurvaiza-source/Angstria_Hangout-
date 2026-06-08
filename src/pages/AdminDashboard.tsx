@@ -203,11 +203,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
     if (!editingPlace) return;
 
     try {
+      // 1. Amankan koordinat lat & lng, lakukan parse float hanya sebelum disimpan agar pengetikan manual (termasuk tanda minus dan desimal) lancar
+      const preparedPlace = {
+        ...editingPlace,
+        lat: editingPlace.lat !== undefined && editingPlace.lat !== '' && editingPlace.lat !== null ? parseFloat(editingPlace.lat as any) : null,
+        lng: editingPlace.lng !== undefined && editingPlace.lng !== '' && editingPlace.lng !== null ? parseFloat(editingPlace.lng as any) : null
+      };
+
+      if (preparedPlace.lat !== null && isNaN(preparedPlace.lat)) preparedPlace.lat = null;
+      if (preparedPlace.lng !== null && isNaN(preparedPlace.lng)) preparedPlace.lng = null;
+
       if (editingPlace.id) {
-        await placesService.updatePlace(editingPlace.id, editingPlace);
+        await placesService.updatePlace(editingPlace.id, preparedPlace as any);
         setStatus({ type: 'success', message: 'Kafe berhasil diperbarui!' });
       } else {
-        await placesService.createPlace(editingPlace as any);
+        await placesService.createPlace(preparedPlace as any);
         setStatus({ type: 'success', message: 'Kafe baru berhasil ditambahkan!' });
       }
       setIsModalOpen(false);
@@ -889,10 +899,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase font-bold text-cafe-mocha/60 tracking-widest pl-2">Garis Lintang / Latitude (opsional)</label>
                       <input 
-                        type="number" 
-                        step="any"
-                        value={editingPlace?.lat || ''}
-                        onChange={(e) => setEditingPlace({ ...editingPlace, lat: parseFloat(e.target.value) })}
+                        type="text" 
+                        value={editingPlace?.lat === null || editingPlace?.lat === undefined ? '' : editingPlace.lat}
+                        onChange={(e) => setEditingPlace({ ...editingPlace, lat: e.target.value as any })}
                         className="w-full bg-cafe-beige border border-cafe-pastel rounded-2xl py-4 px-6 focus:outline-none focus:border-cafe-brown transition-all"
                         placeholder="-2.1283"
                       />
@@ -900,10 +909,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase font-bold text-cafe-mocha/60 tracking-widest pl-2">Garis Bujur / Longitude (opsional)</label>
                       <input 
-                        type="number" 
-                        step="any"
-                        value={editingPlace?.lng || ''}
-                        onChange={(e) => setEditingPlace({ ...editingPlace, lng: parseFloat(e.target.value) })}
+                        type="text" 
+                        value={editingPlace?.lng === null || editingPlace?.lng === undefined ? '' : editingPlace.lng}
+                        onChange={(e) => setEditingPlace({ ...editingPlace, lng: e.target.value as any })}
                         className="w-full bg-cafe-beige border border-cafe-pastel rounded-2xl py-4 px-6 focus:outline-none focus:border-cafe-brown transition-all"
                         placeholder="106.1130"
                       />
